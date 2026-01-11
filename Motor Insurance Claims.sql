@@ -230,13 +230,13 @@ join motordata as m
  
  -- Which vehicles cost the insurer more than they earn?
 
- SELECT 
+ select 
     OBJECT_ID,TYPE_VEHICLE,
     sum(PREMIUM) AS total_premium_paid,
     sum(CLAIM_PAID) AS total_claimed_amount,
     (sum(PREMIUM) - sum(CLAIM_PAID)) AS net_profit
-FROM motordata
-GROUP BY OBJECT_ID,TYPE_VEHICLE
-HAVING sum(CLAIM_PAID) > sum(PREMIUM)
-ORDER BY net_profit;
+from motordata
+group by OBJECT_ID,TYPE_VEHICLE
+having sum(CLAIM_PAID) > sum(PREMIUM)
+order by net_profit;
 
