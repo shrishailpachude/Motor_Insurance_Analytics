@@ -4,6 +4,7 @@ create database insurance_project;
 
 -- Changed inconsistent dates
 -- INSR_BEGIN
+
 select INSR_BEGIN,date_format(str_to_date(INSR_BEGIN,'%d-%b-%y'),'%Y/%m/%d') as insr
 from motordata;
 
@@ -11,14 +12,17 @@ update motordata
 set INSR_BEGIN = date_format(str_to_date(INSR_BEGIN,'%d-%b-%y'),'%Y/%m/%d');
 
 -- INSR_END
+
 update motordata
 set INSR_END = date_format(str_to_date(INSR_END,'%d-%b-%y'),'%Y/%m/%d');
 
 -- Changing inconsistent data
+
 update motordata
 set premium = round(premium,2);
 
 -- Handling Blank and NULL values
+
 update motordata
 set PROD_YEAR = NULL
 where PROD_YEAR='';
@@ -35,20 +39,21 @@ update motordata
 set CLAIM_PAID = round(CLAIM_PAID,2);
 
 -- Changed data type
+
 alter table motordata
 modify SEX text ,
 modify INSR_BEGIN date ,
 modify INSR_END date, 
 modify INSR_TYPE text ,
 modify PREMIUM decimal ,
-modify OBJECT_ID text ,
+modify OBJECT_ID int ,
 modify PROD_YEAR text ,
 modify SEATS_NUM int ,
 modify CARRYING_CAPACITY int ,
-modify TYPE_VEHICLE text ,
+modify TYPE_VEHICLE varchar(20) ,
 modify CCM_TON int ,
-modify MAKE text ,
-modify `USAGE` text ,
+modify MAKE varchar(20) ,
+modify `USAGE` varchar(20) ,
 modify CLAIM_PAID decimal;
 
                                               -- Data Analysis
