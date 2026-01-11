@@ -58,41 +58,50 @@ modify CLAIM_PAID decimal;
 
                                               -- Data Analysis
 -- How many policies are sold?
+
 select count(OBJECT_ID) as Total_policies
 from motordata;											
               
 -- How much Total premium was paid?
+
 select sum(PREMIUM) as Premium_paid
 from motordata;
     
 -- How much Total claim was paid?
+
 select sum(CLAIM_PAID) as Claim_paid
 from motordata;    
 
 -- How many policies were claimed?
+
 select count(*) as Claimed_policies
 from motordata
 where CLAIM_PAID > 0;    
 
 -- What is the average premium paid?
+
 select avg(PREMIUM) as avg_premium
 from motordata;    
 
 -- What is the average claim paid?
+
 select avg(CLAIM_PAID) as avg_premium
 from motordata;    
 
 -- What is the Premium to claim ratio?
+
 select concat(round(100*sum(PREMIUM)/sum(CLAIM_PAID),2),'%') as Premium_to_claim_ratio
 from motordata;  
 
 -- How many policies are taken by each vehicle type?
+
 select TYPE_VEHICLE,count(*) as Total_policies
 from motordata
 group by TYPE_VEHICLE
 order by Total_policies desc;
 
 -- How many policies are claimed by each sex type?
+
 select sex,count(*) as Total_policies
 from motordata
 where CLAIM_PAID > 0
@@ -100,6 +109,7 @@ group by sex
 order by Total_policies desc;
 
 -- What are the TOP 3 Vehicle type claiming policies yearly?
+
 with cte as
 (select year(INSR_BEGIN) as `Year`,TYPE_VEHICLE,format(count(*),0) as Total_claims,
 dense_rank() over(partition by year(INSR_BEGIN) order by count(*) desc) as ranks
@@ -113,6 +123,7 @@ where ranks <= 3;
 
 -- Identify vehicles with rising premiums year-over-year
 -- Business Use-Case: Detect customers whose policy cost is increasing → target for retention.
+
 with premium_years as
 (select OBJECT_ID,year(INSR_BEGIN) as policy_year,premium, 
 lag(premium) over(partition by OBJECT_ID order by year(INSR_BEGIN)) as last_paid_premium
@@ -125,6 +136,7 @@ where last_paid_premium is not null
 
 -- Find the most profitable vehicle segments
 -- Business Goal: What type of vehicle produces the most total premium?
+
 with cte as
 (select TYPE_VEHICLE,count(*) as Total_policies,sum(premium) as Total_premium_paid,
     round(avg(premium),2) as average_premium_paid,sum(CLAIM_PAID) as total_claimed_amount
@@ -136,7 +148,8 @@ select *
 from cte;
 
 -- Analyze claim percentage by vehicle make
--- Business Goal: Identify risky manufacturers.    
+-- Business Goal: Identify risky manufacturers. 
+
 select make,
 count(*) as total_policies,
 sum(case when CLAIM_PAID > 0 then 1 else 0 end) as Total_claims,
@@ -149,6 +162,7 @@ order by claimed_amount desc;
 
 -- Identify aging vehicle portfolio risk
 -- Business Goal: Older vehicles → higher breakdown and claim likelihood.
+
 select PROD_YEAR,count(*) as total_policies,
 sum(PREMIUM) as total_premium,
 sum(CLAIM_PAID) as total_claimed_amount,     
@@ -160,6 +174,7 @@ order by total_claimed_amount desc;
 
 -- Policy renewal behavior analysis
 -- Business Goal: How many years do customers stay with the insurer?
+
 select OBJECT_ID,TYPE_VEHICLE,PROD_YEAR,
 count(*) as Total_renewals,
 min(year(INSR_BEGIN)) as Insurance_start_date, 
@@ -171,6 +186,7 @@ order by Total_renewals desc;
 
 -- Detect customers with repeated claims
 -- Business Goal: Identify customers with consistent claim behavior.
+
 select OBJECT_ID,TYPE_VEHICLE,PROD_YEAR,
 count(*) as Total_claims,
 sum(CLAIM_PAID) as Total_amount_claimed              
@@ -182,6 +198,7 @@ order by Total_claims desc;
 
 -- Correlate engine capacity with claim behavior
 -- Business Goal: Determine if larger vehicles are riskier.
+
 select 
 case when CCM_TON <= 1500 then 'Small'
      when CCM_TON between 1500 and 3000 then 'Medium'
@@ -194,6 +211,7 @@ group by Engine_type
 order by Total_amount_claimed desc;
 
 -- Which vehicles repeatedly pay lower-than-average premiums within the same segment?
+
 with vehicle_segment as
 (select TYPE_VEHICLE,round(avg(PREMIUM),2) as Average_premium
 from motordata
@@ -211,6 +229,7 @@ join motordata as m
  order by years_underpriced desc;
  
  -- Which vehicles cost the insurer more than they earn?
+
  SELECT 
     OBJECT_ID,TYPE_VEHICLE,
     sum(PREMIUM) AS total_premium_paid,
