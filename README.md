@@ -77,6 +77,8 @@ o KPI visualization and business storytelling
 
 CSV / Excel
 
+o Source data storage
+
 The SQL script and dashboard are included for reproducibility.
 
 ________________________________________
